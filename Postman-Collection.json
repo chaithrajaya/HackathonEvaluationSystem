@@ -1,0 +1,807 @@
+{
+	"info": {
+		"_postman_id": "hackathon-evaluator-api",
+		"name": "Hackathon Evaluator API",
+		"description": "Complete API collection for Hackathon Evaluator backend testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"PARTICIPANT\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						},
+						"description": "Register a new user account"
+					}
+				},
+				{
+					"name": "Login (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "Login as admin and get JWT token"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('adminToken', response.token);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Login (Judge)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"judge@example.com\",\n  \"password\": \"judge123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "Login as judge and get JWT token"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('judgeToken', response.token);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Login (Participant)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"participant@example.com\",\n  \"password\": \"participant123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "Login as participant and get JWT token"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('participantToken', response.token);",
+									"}"
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Hackathons",
+			"item": [
+				{
+					"name": "Get All Hackathons",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/hackathons",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "hackathons"]
+						},
+						"description": "Get all hackathons (public access)"
+					}
+				},
+				{
+					"name": "Create Hackathon",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Summer Hackathon 2024\",\n  \"description\": \"Annual hackathon event with amazing prizes and learning opportunities\",\n  \"startDate\": \"2024-06-01T09:00:00\",\n  \"endDate\": \"2024-06-03T18:00:00\",\n  \"createdByUserId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/hackathons",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "hackathons"]
+						},
+						"description": "Create a new hackathon (Admin only)"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('hackathonId', response.hackathonId);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Hackathon by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/hackathons/{{hackathonId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "hackathons", "{{hackathonId}}"]
+						},
+						"description": "Get specific hackathon details"
+					}
+				},
+				{
+					"name": "Get Hackathon Leaderboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/hackathons/{{hackathonId}}/leaderboard",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "hackathons", "{{hackathonId}}", "leaderboard"]
+						},
+						"description": "Get leaderboard for a specific hackathon"
+					}
+				},
+				{
+					"name": "Update Hackathon",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Summer Hackathon 2024 (Updated)\",\n  \"description\": \"Annual hackathon event with amazing prizes and learning opportunities - Updated description\",\n  \"startDate\": \"2024-06-01T09:00:00\",\n  \"endDate\": \"2024-06-03T18:00:00\",\n  \"createdByUserId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/hackathons/{{hackathonId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "hackathons", "{{hackathonId}}"]
+						},
+						"description": "Update hackathon details (Admin only)"
+					}
+				},
+				{
+					"name": "Delete Hackathon",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/hackathons/{{hackathonId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "hackathons", "{{hackathonId}}"]
+						},
+						"description": "Delete hackathon (Admin only)"
+					}
+				}
+			]
+		},
+		{
+			"name": "Teams",
+			"item": [
+				{
+					"name": "Create Team",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"teamName\": \"Code Warriors\",\n  \"hackathonId\": \"{{hackathonId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/teams",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "teams"]
+						},
+						"description": "Create a new team (Admin only)"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('teamId', response.teamId);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Team by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/teams/{{teamId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "teams", "{{teamId}}"]
+						},
+						"description": "Get team details"
+					}
+				},
+				{
+					"name": "Get Teams by Hackathon",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/teams/hackathon/{{hackathonId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "teams", "hackathon", "{{hackathonId}}"]
+						},
+						"description": "Get all teams for a specific hackathon"
+					}
+				},
+				{
+					"name": "Update Team",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"teamName\": \"Code Warriors (Updated)\",\n  \"hackathonId\": \"{{hackathonId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/teams/{{teamId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "teams", "{{teamId}}"]
+						},
+						"description": "Update team details (Admin only)"
+					}
+				},
+				{
+					"name": "Delete Team",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/teams/{{teamId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "teams", "{{teamId}}"]
+						},
+						"description": "Delete team (Admin only)"
+					}
+				}
+			]
+		},
+		{
+			"name": "Submissions",
+			"item": [
+				{
+					"name": "Create Submission",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{participantToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"teamId\": \"{{teamId}}\",\n  \"hackathonId\": \"{{hackathonId}}\",\n  \"projectTitle\": \"AI-Powered Task Manager\",\n  \"githubLink\": \"https://github.com/example/ai-task-manager\",\n  \"description\": \"An intelligent task management application that uses AI to prioritize tasks and provide smart recommendations. Built with React, Node.js, and machine learning APIs.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/submissions",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "submissions"]
+						},
+						"description": "Create a new project submission (Participant only)"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('submissionId', response.submissionId);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Submission by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{participantToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/submissions/{{submissionId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "submissions", "{{submissionId}}"]
+						},
+						"description": "Get submission details"
+					}
+				},
+				{
+					"name": "Get Submissions by Team",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{participantToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/submissions/team/{{teamId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "submissions", "team", "{{teamId}}"]
+						},
+						"description": "Get all submissions for a team"
+					}
+				},
+				{
+					"name": "Get Submissions by Hackathon",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/submissions/hackathon/{{hackathonId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "submissions", "hackathon", "{{hackathonId}}"]
+						},
+						"description": "Get all submissions for a hackathon (Admin/Judge only)"
+					}
+				},
+				{
+					"name": "Update Submission",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{participantToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"teamId\": \"{{teamId}}\",\n  \"hackathonId\": \"{{hackathonId}}\",\n  \"projectTitle\": \"AI-Powered Task Manager (Updated)\",\n  \"githubLink\": \"https://github.com/example/ai-task-manager\",\n  \"description\": \"An intelligent task management application that uses AI to prioritize tasks and provide smart recommendations. Built with React, Node.js, and machine learning APIs. Updated with new features.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/submissions/{{submissionId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "submissions", "{{submissionId}}"]
+						},
+						"description": "Update submission details"
+					}
+				},
+				{
+					"name": "Get Submission Evaluations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{participantToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/submissions/{{submissionId}}/evaluations",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "submissions", "{{submissionId}}", "evaluations"]
+						},
+						"description": "Get all evaluations for a submission"
+					}
+				}
+			]
+		},
+		{
+			"name": "Evaluations",
+			"item": [
+				{
+					"name": "Add Evaluation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{judgeToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"submissionId\": \"{{submissionId}}\",\n  \"score\": 85,\n  \"feedback\": \"Excellent project! Great implementation of AI features, clean code structure, and impressive UI/UX design. The task prioritization algorithm works well and the overall concept is innovative.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/evaluations",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "evaluations"]
+						},
+						"description": "Add evaluation for a submission (Judge only)"
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('evaluationId', response.evaluationId);",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Get Evaluation by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{judgeToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/evaluations/{{evaluationId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "evaluations", "{{evaluationId}}"]
+						},
+						"description": "Get evaluation details"
+					}
+				},
+				{
+					"name": "Get Evaluations by Submission",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{judgeToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/evaluations/submission/{{submissionId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "evaluations", "submission", "{{submissionId}}"]
+						},
+						"description": "Get all evaluations for a submission"
+					}
+				},
+				{
+					"name": "Get Evaluations by Judge",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{judgeToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/evaluations/judge/3",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "evaluations", "judge", "3"]
+						},
+						"description": "Get all evaluations done by a specific judge"
+					}
+				},
+				{
+					"name": "Update Evaluation",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{judgeToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"submissionId\": \"{{submissionId}}\",\n  \"score\": 90,\n  \"feedback\": \"Excellent project! Great implementation of AI features, clean code structure, and impressive UI/UX design. The task prioritization algorithm works well and the overall concept is innovative. Updated score after reconsideration.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/evaluations/{{evaluationId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "evaluations", "{{evaluationId}}"]
+						},
+						"description": "Update evaluation (Judge or Admin only)"
+					}
+				},
+				{
+					"name": "Delete Evaluation",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/evaluations/{{evaluationId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "evaluations", "{{evaluationId}}"]
+						},
+						"description": "Delete evaluation (Admin only)"
+					}
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users"]
+						},
+						"description": "Get all users (Admin only)"
+					}
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "1"]
+						},
+						"description": "Get user details"
+					}
+				},
+				{
+					"name": "Get User Submissions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{participantToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/3/submissions",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "3", "submissions"]
+						},
+						"description": "Get submissions by a user"
+					}
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 1,\n  \"name\": \"Admin User (Updated)\",\n  \"email\": \"admin@example.com\",\n  \"role\": \"ADMIN\",\n  \"teamId\": null,\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "1"]
+						},
+						"description": "Update user details"
+					}
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/4",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "users", "4"]
+						},
+						"description": "Delete user (Admin only)"
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
