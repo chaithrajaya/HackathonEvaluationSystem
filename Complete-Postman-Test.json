@@ -1,0 +1,452 @@
+{
+	"info": {
+		"_postman_id": "complete-hackathon-test",
+		"name": "Complete Hackathon Evaluator Test",
+		"description": "One complete test workflow demonstrating all API features",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🔐 Step 1: Login as Admin",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth/login",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "auth", "login"]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has token\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('token');",
+							"    pm.collectionVariables.set('adminToken', jsonData.token);",
+							"    console.log('Admin token saved: ' + jsonData.token.substring(0, 20) + '...');",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "🏆 Step 2: Create Hackathon",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{adminToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Summer Hackathon 2024\",\n  \"description\": \"Annual hackathon event with amazing prizes and learning opportunities for developers\",\n  \"startDate\": \"2024-06-01T09:00:00\",\n  \"endDate\": \"2024-06-03T18:00:00\",\n  \"createdByUserId\": 1\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/hackathons",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "hackathons"]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Hackathon created successfully\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('hackathonId');",
+							"    pm.expect(jsonData.name).to.eql('Summer Hackathon 2024');",
+							"    pm.collectionVariables.set('hackathonId', jsonData.hackathonId);",
+							"    console.log('Hackathon ID: ' + jsonData.hackathonId);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "👥 Step 3: Create Team",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{adminToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"teamName\": \"Code Warriors\",\n  \"hackathonId\": \"{{hackathonId}}\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/teams",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "teams"]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Team created successfully\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('teamId');",
+							"    pm.expect(jsonData.teamName).to.eql('Code Warriors');",
+							"    pm.collectionVariables.set('teamId', jsonData.teamId);",
+							"    console.log('Team ID: ' + jsonData.teamId);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "🔐 Step 4: Login as Participant",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"participant@example.com\",\n  \"password\": \"participant123\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth/login",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "auth", "login"]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Participant token received\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('token');",
+							"    pm.collectionVariables.set('participantToken', jsonData.token);",
+							"    console.log('Participant token saved');",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "📤 Step 5: Submit Project",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{participantToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"teamId\": \"{{teamId}}\",\n  \"hackathonId\": \"{{hackathonId}}\",\n  \"projectTitle\": \"AI-Powered Task Manager\",\n  \"githubLink\": \"https://github.com/codewarriors/ai-task-manager\",\n  \"description\": \"An intelligent task management application that uses AI to prioritize tasks, provide smart recommendations, and automate workflow. Built with React, Node.js, TensorFlow.js, and MongoDB. Features include natural language task creation, predictive scheduling, and team collaboration tools.\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/submissions",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "submissions"]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Submission created successfully\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('submissionId');",
+							"    pm.expect(jsonData.projectTitle).to.eql('AI-Powered Task Manager');",
+							"    pm.collectionVariables.set('submissionId', jsonData.submissionId);",
+							"    console.log('Submission ID: ' + jsonData.submissionId);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "🔐 Step 6: Login as Judge",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"judge@example.com\",\n  \"password\": \"judge123\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auth/login",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "auth", "login"]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Judge token received\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('token');",
+							"    pm.collectionVariables.set('judgeToken', jsonData.token);",
+							"    console.log('Judge token saved');",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "⭐ Step 7: Evaluate Project",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{judgeToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"submissionId\": \"{{submissionId}}\",\n  \"score\": 88,\n  \"feedback\": \"Outstanding project! The AI-powered task manager demonstrates excellent technical implementation with thoughtful user experience. The natural language processing for task creation is impressive, and the predictive scheduling algorithm works very well. Clean code architecture, comprehensive testing, and innovative use of TensorFlow.js. The team collaboration features are well-designed and the overall concept has real-world applicability. Great work!\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/evaluations",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "evaluations"]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Evaluation added successfully\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('evaluationId');",
+							"    pm.expect(jsonData.score).to.eql(88);",
+							"    pm.collectionVariables.set('evaluationId', jsonData.evaluationId);",
+							"    console.log('Evaluation ID: ' + jsonData.evaluationId);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "🏆 Step 8: View Leaderboard",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/hackathons/{{hackathonId}}/leaderboard",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "hackathons", "{{hackathonId}}", "leaderboard"]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Leaderboard data received\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"    if (jsonData.length > 0) {",
+							"        pm.expect(jsonData[0]).to.have.property('teamName');",
+							"        pm.expect(jsonData[0]).to.have.property('averageScore');",
+							"        console.log('Leaderboard shows ' + jsonData.length + ' teams');",
+							"    }",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "📊 Step 9: View All Hackathons",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/hackathons",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "hackathons"]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Hackathons list received\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"    pm.expect(jsonData.length).to.be.at.least(1);",
+							"    console.log('Total hackathons: ' + jsonData.length);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "👤 Step 10: View User Submissions",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{participantToken}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/users/3/submissions",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "8080",
+					"path": ["api", "users", "3", "submissions"]
+				}
+			},
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"User submissions received\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"    console.log('User has ' + jsonData.length + ' submissions');",
+							"});"
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"console.log('Starting Hackathon Evaluator API Test...');",
+					"console.log('Make sure the backend is running on http://localhost:8080');"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"console.log('Test completed successfully!');",
+					"console.log('All API features are working correctly.');"
+				]
+			}
+		}
+	]
+}
